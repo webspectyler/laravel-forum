@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Thread;
+use App\Channel;
+use App\Filters\ThreadFilters;
 use Illuminate\Http\Request;
 
 class ThreadController extends Controller
@@ -16,9 +18,16 @@ class ThreadController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Channel $channel, ThreadFilters $filters)
     {
-        $threads = Thread::latest()->get();
+
+        //$threads = $this->getThreads($channel);
+        //$threads = (new \App\Queries\ThreadsQuery)->get();
+
+        $threads = $this->getThreads($channel, $filters);
+        if (request()->wantsJson() ){
+            return $threads;
+        }
         return view('threads.index', compact('threads'));
     }
 
@@ -40,8 +49,15 @@ class ThreadController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'title' => 'required',
+            'body' => 'required',
+            'channel_id' => 'required|exists:channels,id',
+        ]);
+
         $thread = Thread::create([
             'user_id' => auth()->id(),
+            'channel_id'  => request('channel_id'),
             'title' => request('title'),
             'body' => request('body'),
         ]);
@@ -54,9 +70,12 @@ class ThreadController extends Controller
      * @param  \App\Thread  $thread
      * @return \Illuminate\Http\Response
      */
-    public function show(Thread $thread)
+    public function show($channel_id, Thread $thread)
     {
-        return view('threads.show', compact('thread'));
+        return view('threads.show', [
+            'thread' => $thread,
+            'replies' => $thread->replies()->paginate(25),
+        ]);
         return $thread;
     }
 
@@ -92,5 +111,17 @@ class ThreadController extends Controller
     public function destroy(Thread $thread)
     {
         //
+    }
+
+    public function getThreads($channel, $filters)
+    {
+        $threads = Thread::latest()->filter($filters);
+        if ($channel->exists) {
+            $threads->where('channel_id', $channel->id);
+        }
+
+        //die('<pre>'.var_export($threads->toSql(),true).'</pre>');
+
+        return $threads->get();
     }
 }

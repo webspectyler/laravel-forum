@@ -6,17 +6,17 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-class ParticipateInForum extends TestCase
+class ParticipateInForumTest extends TestCase
 {
 	use DatabaseMigrations;
 
 	/** @test */
 	public function unauthenticated_users_may_not_add_replies()
 	{
-		$this->expectException('Illuminate\Auth\AuthenticationException');
+        $this->withExceptionHandling();
 
-		$reply = factory('App\Reply')->create();
-		$this->post('threads/1/replies', []);
+		$this->post('threads/some-channel/1/replies', [])
+            ->assertRedirect('/login');
 	}
 
     /** @test */
@@ -31,4 +31,16 @@ class ParticipateInForum extends TestCase
     	$this->get($thread->path())
     		->assertSee($reply->body);
 	}
+
+    /** @test */
+    public function a_reply_requires_a_body()
+    {
+        $this->withExceptionHandling()->signIn();
+        $thread = factory('App\Thread')->create();
+        $reply = factory('App\Thread')->make(['thread_id' => $thread->id, 'body' => null]);
+
+        $this->post($thread->path() . '/replies', $reply->toArray())
+            ->assertSessionHasErrors('body');
+
+    }
 }
