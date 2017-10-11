@@ -7,7 +7,7 @@ use App\Favorite;
 use Illuminate\Http\Request;
 
 
-class FavoriteController extends Controller
+class FavoritesController extends Controller
 {
     public function __construct()
     {

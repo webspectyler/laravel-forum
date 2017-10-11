@@ -16,15 +16,15 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/threads', 'ThreadController@index');
-Route::get('/threads/create', 'ThreadController@create');
-Route::get('/threads/{channel}/{thread}', 'ThreadController@show');
-#Route::get('/threads/{channel}', 'ChannelController@index');
-Route::get('/threads/{channel}', 'ThreadController@index');
-Route::post('/threads', 'ThreadController@store');
-Route::post('/threads/{channel}/{thread}/replies', 'ReplyController@store');
-Route::post('/replies/{reply}/favorites', 'FavoriteController@store');
 
+Route::get('/home', 'HomeController@index');
+Route::get('threads', 'ThreadsController@index');
+Route::get('threads/create', 'ThreadsController@create');
+Route::get('threads/{channel}/{thread}', 'ThreadsController@show');
+Route::delete('threads/{channel}/{thread}', 'ThreadsController@destroy');
+Route::post('threads', 'ThreadsController@store');
+Route::get('threads/{channel}', 'ThreadsController@index');
+Route::post('/threads/{channel}/{thread}/replies', 'RepliesController@store');
+Route::post('/replies/{reply}/favorites', 'FavoritesController@store');
 
-
+Route::get('/profiles/{user}', 'ProfilesController@show')->name('profile');

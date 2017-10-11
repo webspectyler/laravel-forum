@@ -1,23 +1,25 @@
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="level">
-<h5 class="flex">
-                        <a href="#">{{ $reply->owner->name }}</a> said {{ $reply->created_at->diffForHumans()}}...</h5>
-                        {{-- @unless (!$reply->isFavoritedBy(auth()->id())) --}}
-                        <div class="">
-                            <form method="POST" action="/replies/{{$reply->id}}/favorites">
-                                {{ csrf_field() }}
-                                <button class="btn btn-default" {{ $reply->isFavoritedBy(auth()->id()) ? 'disabled' : ''}}> {{$reply->favorites_count }} {{ str_plural('Favorite', $reply->favorites_count) }}</button>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="level">
+            <h5 class="flex">
+                <a href="{{ route('profile', $reply->owner) }}">
+                    {{ $reply->owner->name }}
+                </a> said {{ $reply->created_at->diffForHumans() }}...
+            </h5>
 
-                            </form>
-                        </div>
-                        {{--@endunless--}}
-                    </div>
-                </div>
-                <div class="panel-body">
+            <div>
+                <form method="POST" action="/replies/{{ $reply->id }}/favorites">
+                    {{ csrf_field() }}
 
-                      {{ $reply->body }}
-
-
-                </div>
+                    <button type="submit" class="btn btn-default" {{ $reply->isFavorited() ? 'disabled' : '' }}>
+                        {{ $reply->favorites_count }} {{ str_plural('Favorite', $reply->favorites_count) }}
+                    </button>
+                </form>
             </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        {{ $reply->body }}
+    </div>
+</div>
