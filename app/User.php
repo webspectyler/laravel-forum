@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\RecordsActivity;
 
 class User extends Authenticatable
 {
@@ -36,4 +37,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Thread::class);
     }
+
+    /**
+     * Get all activity for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function activity()
+    {
+        return $this->hasMany(Activity::class);
+    }
+
 }
